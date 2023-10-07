@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <meta charset="UTF-8">
+    <title>Hotel Management</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+    <link rel="icon" href= 
+"android-chrome-512x512.png" 
+          type="image/x-icon"> 
+           <link rel="stylesheet"
+          type="text/css"
+          href="css/bootstrap.css" />
+</head>
+<body>
+<div class="container">
+    <img src="hotel%20logo.jpg" alt="The Continental Hotel Logo" class="hotel-logo" data-tilt>
+    <h1>Continental</h1>
+    <div class="button-container">
+        <button class="animated-button" onclick="location.href='Guest/Guest.html';" data-tilt>Guest</button>
+        <button class="animated-button" onclick="location.href='Room/Room.html';" data-tilt>Room</button>
+        <button class="animated-button" onclick="location.href='Reservation/Reservation.html';" data-tilt>Reservation</button>
+        <button class="animated-button" onclick="location.href='Service/Service.html';" data-tilt>Service</button>
+        <button class="animated-button" onclick="location.href='ServiceUsage/ServiceUsage.html';" data-tilt>Service Usage</button>
+        <button class="animated-button" onclick="location.href='Staff/Staff.html';" data-tilt>Staff</button>
+    </div>
+</div>
+<script>
+    VanillaTilt.init(document.querySelectorAll(".animated-button, .hotel-logo"), {
+        max: 15,
+        speed: 400,
+        glare: true,
+        "max-glare": 0.5
+    });
+
+    VanillaTilt.init(document.querySelector(".hotel-logo"), {
+        max: 15,
+        speed: 400,
+        glare: true,
+        "max-glare": 0.5,
+        scale: 1.1
+    });
+</script>
+
+</body>
+</html>

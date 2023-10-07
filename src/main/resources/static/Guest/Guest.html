@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="GuestStyle.css">
+    <title>Guest Page</title>
+      <link rel="icon" href= 
+"/android-chrome-512x512.png" 
+          type="image/x-icon"> 
+     <link href=
+"https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity=
+"sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU"
+          crossorigin="anonymous"/>
+    <script>
+        let currentGuestId;
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        function paginate(array, page, itemsPerPage) {
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            return array.slice(startIndex, endIndex);
+        }
+
+        function createPaginationButtons(totalItems, itemsPerPage) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.classList.add('pagination-btn');
+                button.addEventListener('click', () => {
+                    currentPage = i;
+                    fetchGuests();
+                });
+                paginationDiv.appendChild(button);
+            }
+        }
+
+        async function fetchGuests() {
+            const searchQuery = document.getElementById('search').value.toLowerCase();
+            const response = await fetch('/guests');
+            const guests = await response.json();
+            const filteredGuests = guests.filter(guest => (
+                guest.firstName.toLowerCase().includes(searchQuery) ||
+                guest.lastName.toLowerCase().includes(searchQuery) ||
+                guest.phone.toLowerCase().includes(searchQuery)
+            ));
+            const table = document.getElementById('guestTable');
+            const tbody = table.querySelector('tbody');
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+
+            // Apply pagination on the displayed guests
+            const paginatedGuests = paginate(filteredGuests, currentPage, itemsPerPage);
+
+            paginatedGuests.forEach(guest => {
+                if (
+                    guest.firstName.toLowerCase().includes(searchQuery) ||
+                    guest.lastName.toLowerCase().includes(searchQuery) ||
+                    guest.phone.toLowerCase().includes(searchQuery)
+                ) {
+                    const row = tbody.insertRow(-1);
+                    const idCell = row.insertCell(0);
+                    const firstNameCell = row.insertCell(1);
+                    const lastNameCell = row.insertCell(2);
+                    const emailCell = row.insertCell(3);
+                    const phoneCell = row.insertCell(4);
+                    const addressCell = row.insertCell(5);
+                    const actionsCell = row.insertCell(6);
+
+                    idCell.textContent = guest.guestID;
+                    firstNameCell.textContent = guest.firstName;
+                    lastNameCell.textContent = guest.lastName;
+                    emailCell.textContent = guest.email;
+                    phoneCell.textContent = guest.phone;
+                    addressCell.textContent = guest.address;
+
+                    const editButton = document.createElement('button');
+                    editButton.textContent = 'Edit';
+                    editButton.className = 'btn btn-outline-success';
+                    editButton.addEventListener('click', () => {
+                        showEditModal(guest);
+                    });
+                    actionsCell.appendChild(editButton);
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.className = 'btn btn-outline-danger'; 
+                    deleteButton.addEventListener('click', async () => {
+                        const confirmDelete = confirm('Are you sure you want to delete this guest?');
+                        if (confirmDelete) {
+                            const response = await fetch(`/guests/${guest.guestID}`, {
+                                method: 'DELETE'
+                            });
+                            if (response.ok) {
+                                location.reload();
+                            } else {
+                                alert('Failed to delete guest.');
+                            }
+                        }
+                    });
+                    actionsCell.appendChild(deleteButton);
+
+                    const detailsButton = document.createElement('button');
+                    detailsButton.textContent = 'Details';
+                    detailsButton.className = 'btn btn-outline-primary';
+                    detailsButton.addEventListener('click', () => {
+                        showDetailsModal(guest);
+                    });
+                    actionsCell.appendChild(detailsButton);
+
+                }
+            });
+            const paginationDiv = document.getElementById('pagination');
+            paginationDiv.innerHTML = '';
+            createPaginationButtons(guests.length, itemsPerPage);
+        }
+
+
+        function showEditModal(guest) {
+            currentGuestId = guest.guestID;
+            document.getElementById('editFirstName').value = guest.firstName;
+            document.getElementById('editLastName').value = guest.lastName;
+            document.getElementById('editEmail').value = guest.email;
+            document.getElementById('editPhone').value = guest.phone;
+            document.getElementById('editAddress').value = guest.address;
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function hideEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        async function updateGuest(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const response = await fetch(`/guests/${currentGuestId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(formData))
+            });
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Failed to update guest.');
+            }
+        }
+
+        function showDetailsModal(guest) {
+            document.getElementById('detailsReservationID').textContent = guest.reservation.reservationID;
+            document.getElementById('detailsCheckInTime').textContent = guest.reservation.checkInTime;
+            document.getElementById('detailsCheckOutTime').textContent = guest.reservation.checkOutTime;
+            document.getElementById('detailsDuration').textContent = guest.reservation.duration;
+            document.getElementById('detailsTotal').textContent = guest.reservation.total;
+            document.getElementById('detailsPerson').textContent = guest.reservation.person;
+
+            const serviceUsageTableBody = document.getElementById('detailsServiceUsageTableBody');
+            while (serviceUsageTableBody.firstChild) {
+                serviceUsageTableBody.removeChild(serviceUsageTableBody.firstChild);
+            }
+            guest.serviceUsages.forEach(serviceUsage => {
+                const row = serviceUsageTableBody.insertRow(-1);
+                const serviceUsageIdCell = row.insertCell(0);
+                const timeInCell = row.insertCell(1);
+                const timeOutCell = row.insertCell(2);
+                const serviceCell = row.insertCell(3);
+                const priceCell = row.insertCell(4);
+
+                serviceUsageIdCell.textContent = serviceUsage.serviceUsageID;
+                timeInCell.textContent = serviceUsage.timeIn;
+                timeOutCell.textContent = serviceUsage.timeOut;
+                serviceCell.textContent = serviceUsage.service.serviceName;
+                priceCell.textContent = '$' + serviceUsage.service.price;
+            });
+
+            document.getElementById('detailsModal').style.display = 'block';
+        }
+
+        function hideDetailsModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+
+        async function createGuest(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const response = await fetch('/guests', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(formData))
+            });
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Failed to create guest.');
+            }
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === document.getElementById('editModal')) {
+                hideEditModal();
+            }
+            if (event.target === document.getElementById('detailsModal')) {
+                hideDetailsModal();
+            }
+        });
+
+        function showCreateModal() {
+            document.getElementById('createModal').style.display = 'block';
+        }
+
+        function hideCreateModal() {
+            document.getElementById('createModal').style.display = 'none';
+        }
+
+        function toggleCreateForm() {
+            const form = document.getElementById('createGuestForm');
+            if (form.style.maxHeight) {
+                form.style.maxHeight = null;
+            } else {
+                form.style.maxHeight = form.scrollHeight + 'px';
+            }
+        }
+
+    </script>
+</head>
+<body onload="fetchGuests();">
+	<div class="container">
+<nav class="navbar navbar-dark bg-dark">
+    <a href="/index.html">Home</a>
+    <a href="/Guest/Guest.html">Guest</a>
+    <a href="/Room/Room.html">Room</a>
+    <a href="/Reservation/Reservation.html">Reservation</a>
+    <a href="/Service/Service.html">Service</a>
+    <a href="/ServiceUsage/ServiceUsage.html">Service Usage</a>
+    <a href="/Staff/Staff.html">Staff</a>
+</nav>
+</div>
+<div class="searchBlock" >
+    <label for="search" class="inputLabel">Search:</label>
+    <input type="text" id="search" placeholder="Search by fn, ln or phone" oninput="fetchGuests();">
+    
+</div>
+
+<div class="container" align="center">
+	
+	<button id="createGuestButton" onclick="toggleCreateForm();"  class="btn btn-info">Create New Guest</button>
+	
+</div>
+
+
+<div id="createGuestForm" align="center">
+    <form onsubmit="createGuest(event);" class="formBlock" style="width: 400px;">
+        <label for="firstName" style="text-align:center" >First Name</label>
+        <input type="text" id="firstName" name="firstName"placeholder="FirstName" required>
+
+        <label for="lastName" style="text-align:center" >Last Name</label>
+        <input type="text" id="lastName" name="lastName" placeholder="LastName" required>
+
+        <label for="email" style="text-align:center" >Email</label>
+        <input type="email" id="email" name="email" placeholder="Email" required>
+
+        <label for="phone" style="text-align:center" >Phone</label>
+        <input type="text" id="phone" name="phone" placeholder="Phone" required>
+
+        <label for="address" style="text-align:center" >Address</label>
+        <input type="text" id="address" name="address" placeholder="Address" required><br>
+
+        <button type="submit" class="btn btn-success" style="width: 150px; margin: 0 auto;">Create Guest</button>
+    </form>
+</div>
+
+<div class="container mt-3">
+<table id="guestTable" class="table table-bordered">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+		
+    </tbody>
+</table>
+</div>
+<div id="pagination" class="pagination"></div>
+
+
+
+<div id="editModal">
+    <div id="editModalContent" class="container" align="center">
+        <h2>Edit Guest</h2>
+        <form onsubmit="updateGuest(event);" class="formBlock" align="center" style="width: 400px;">
+            <label for="editFirstName">First Name:</label>
+            <input type="text"style="text-align:center"  id="editFirstName" name="firstName" required>
+
+            <label for="editLastName">Last Name:</label>
+            <input type="text" style="text-align:center" id="editLastName" name="lastName" required>
+
+            <label for="editEmail">Email:</label>
+            <input type="email" style="text-align:center" id="editEmail" name="email" required>
+
+            <label for="editPhone">Phone:</label>
+            <input type="text" style="text-align:center" id="editPhone" name="phone" required>
+
+            <label for="editAddress">Address:</label>
+            <input type="text" style="text-align:center" id="editAddress" name="address" required><br>
+  
+            <button type="submit" class="btn btn-success btn-lg" class="text-center" align="center"style="width: 200px; margin: 0 auto;">Update Guest</button>
+      <br>
+        <button onclick="hideEditModal();"class="btn btn-success btn-lg" class="text-center" align="center"style="width: 200px; margin: 0 auto;">Cancel</button>
+     
+        </form>
+    </div>
+</div>
+<div id="detailsModal" style="text-align:center"  >
+    <div id="detailsModalContent" >
+        <h2>Reservation and Service Usage Details</h2>
+        <h3 >Reservation Details</h3>
+        <p>Reservation ID: <span id="detailsReservationID"></span></p>
+        <p>Check-In Time: <span id="detailsCheckInTime"></span></p>
+        <p>Check-Out Time: <span id="detailsCheckOutTime"></span></p>
+        <p>Duration: <span id="detailsDuration"></span> days</p>
+        <p>Total: $<span id="detailsTotal"></span></p>
+        <p>Person: <span id="detailsPerson"></span></p>
+
+        <h3 style="text-align:center" >Service Usage Details</h3>
+        
+        <div class="container mt-2">
+        <table id="detailsServiceUsageTable" class="table table-bordered" style="border-collapse: collapse; width: 100%;">
+            <thead>
+            <tr>
+                <th style="border: 1px solid black; padding: 8px; text-align: left; background-color: #f2f2f2;">
+                    ServiceUsageID
+                </th>
+                <th style="border: 1px solid black; padding: 8px; text-align: left; background-color: #f2f2f2;">TimeIn
+                </th>
+                <th style="border: 1px solid black; padding: 8px; text-align: left; background-color: #f2f2f2;">
+                    TimeOut
+                </th>
+                <th style="border: 1px solid black; padding: 8px; text-align: left; background-color: #f2f2f2;">
+                    Service
+                </th>
+                <th style="border: 1px solid black; padding: 8px; text-align: left; background-color: #f2f2f2;">Price
+                </th>
+            </tr>
+            </thead>
+            <tbody id="detailsServiceUsageTableBody">
+            </tbody>
+        </table>
+        </div>
+        <button onclick="hideDetailsModal();"class="btn btn-success btn-lg"  class="text-center" align="center"style="width: 150px; margin: 0 auto;">Close</button>
+    </div>
+</div>
+
+
+</body>
+</html>
+

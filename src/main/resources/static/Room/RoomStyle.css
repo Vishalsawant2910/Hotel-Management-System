@@ -1,0 +1,259 @@
+/* Color scheme */
+:root {
+	--background-color: #1C1C1C;
+	--primary-color: #800000;
+	--accent-color: #D4AF37;
+	--text-color: #C0C0C0;
+	--secondary-color: #3C3C3C;
+}
+
+/* Body styles */
+body {
+	font-family: 'Montserrat', sans-serif;
+	background-color: var(--background-color);
+	background-image: url('background.jpg');
+	background-size: cover;
+	/*color: var(--text-color);*/
+}
+
+
+input[type="email"]::placeholder {
+	text-align: center;
+}
+
+input[type="number"]::placeholder {
+	text-align: center;
+}
+
+input[type="text"]::placeholder {
+	text-align: center;
+}
+
+
+.searchBlock {
+	border: 7px solid transparent;
+}
+
+ 
+
+.formBlock {
+	width: 50%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* Form styles */
+form {
+	margin: 1.25rem auto;
+	display: flex;
+	flex-direction: column;
+	width: 50%;
+}
+
+form input,
+form button,
+form select {
+	margin-top: 10px;
+	padding: 8px;
+	border-radius: 5px;
+	border: 1px solid #666;
+	font-size: 16px;
+	font-family: "Helvetica Neue", Arial, sans-serif;
+	color: #00000;
+	opacity: 0.7;
+}
+
+form input:hover,
+form button:hover,
+form select:hover {
+	background-color: #666;
+	color: white;
+	cursor: pointer;
+}
+
+label {
+	font-family: "Helvetica Neue", Arial, sans-serif;
+	font-size: 30px;
+	font-weight: 700;
+	color: #000000;
+	font-size: 20px;
+}
+
+
+button {
+	font-size: 1.5rem;
+	padding: 1rem 2rem;
+	border-radius: 5px;
+	border: none;
+	background-color: var(--accent-color);
+	color: var(--background-color);
+	font-weight: bold;
+	cursor: pointer;
+}
+
+/* Table styles */
+table {
+	border-collapse: collapse;
+	width: 100%;
+	font-family: "Helvetica Neue", Arial, sans-serif;
+	font-weight: bold;
+	opacity: 0.9;
+	background-color: white;
+}
+
+th,
+td {
+	border: 1px solid var(--secondary-color);
+	padding: 0.5rem;
+	text-align: left;
+	word-wrap: break-word;
+	max-width: 150px;
+}
+
+th {
+	background-color: var(--accent-color);
+	color: var(--background-color);
+}
+
+td {
+	color: var(--background-color);
+}
+
+td button {
+	margin-top: 10px;
+	padding: 8px;
+	border-radius: 5px;
+	border: 1px solid #666;
+	font-size: 16px;
+	font-family: "Helvetica Neue", Arial, sans-serif;
+	color: #00000;
+	opacity: 0.7
+}
+
+/* Modal styles */
+#editModal {
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+#editModalContent {
+	background-color: #fefefe;
+	margin: 10% auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 50%;
+}
+
+/* Navbar styles */
+
+.navbar {
+    overflow: hidden;
+    border-radius: 25px;
+    background-color: #1C1427;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    border-bottom: 5px solid #2192FF;
+}
+
+.navbar a {
+    float: left;
+    display: block;
+    color: #E4FBFF;
+    text-align: center;
+    padding: 12px 16px;
+    text-decoration: none;
+}
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+	background-color: #fefefe;
+	margin: 15% auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
+}
+
+.h2Block {
+	border: 4px solid #3C3C3C;
+	width: 50%;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: #D4AF37;
+	text-align: center;
+	font-family: "Helvetica Neue", Arial, sans-serif;
+	font-size: 40px;
+}
+
+#createModal {
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+#createModalContent {
+	background-color: #fefefe;
+	margin: 10% auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 50%;
+}
+
+/*#createRoomButton {
+    background-color: var(--accent-color);
+    border: none;
+    color: var(--secondary-color);
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 20px 0;
+    cursor: pointer;
+    transition-duration: 0.4s;
+    border-radius: 4px;
+}*/
+
+#createRoomButton:hover {
+	 
+	box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* Create Guest Form */
+#createRoomForm {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.5s ease-out;
+	padding: 0;
+	margin-bottom: 0;
+	border-radius: 4px;
+}
+
+/* Create Guest Form in visible mode */
+#createRoomForm.visible {
+	max-height: 500px;
+	padding: 20px;
+	margin-bottom: 20px;
+}
